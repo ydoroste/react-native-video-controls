@@ -12,6 +12,7 @@ import {
   Image,
   View,
   Text,
+  I18nManager
 } from 'react-native';
 import padStart from 'lodash/padStart';
 
@@ -785,32 +786,17 @@ export default class VideoPlayer extends Component {
       /**
        * When panning, update the seekbar position, duh.
        */
-      onPanResponderMove: (evt, gestureState) => {
-        const position = this.state.seekerOffset + gestureState.dx;
-        this.setSeekerPosition(position);
-        let state = this.state;
+      
 
-        if (
-          this.player.scrubbingTimeStep > 0 &&
-          !state.loading &&
-          !state.scrubbing
-        ) {
-          const time = this.calculateTimeFromSeekerPosition();
-          const timeDifference = Math.abs(state.currentTime - time) * 1000;
-
-          if (
-            time < state.duration &&
-            timeDifference >= this.player.scrubbingTimeStep
-          ) {
-            state.scrubbing = true;
-
-            this.setState(state);
-            setTimeout(() => {
-              this.player.ref.seek(time, this.player.scrubbingTimeStep);
-            }, 1);
-          }
-        }
-      },
+    onPanResponderMove: ( evt, gestureState ) => {  
+                 let position;
+                 if(I18nManager.isRTL){
+                       position = this.state.seekerOffset + (1 - gestureState.dx);
+                  }else{
+                       position =  this.state.seekerOffset + gestureState.dx;
+                  }
+                 this.setSeekerPosition( position );
+             },
 
       /**
        * On release we update the time and seek to it in the video.
